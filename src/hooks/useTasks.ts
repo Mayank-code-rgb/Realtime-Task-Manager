@@ -12,6 +12,7 @@ export interface Task {
     assigneeEmail: string;
     completed: boolean;
     createdAt: any;
+    dueDate?: string;
 }
 
 export const useTasks = () => {
@@ -61,7 +62,7 @@ export const useTasks = () => {
         return () => unsubscribe();
     }, [user]);
 
-    const addTask = async (title: string, description: string) => {
+    const addTask = async (title: string, description: string, dueDate?: string) => {
         if (!user) return;
         try {
             await addDoc(collection(db, 'tasks'), {
@@ -70,7 +71,8 @@ export const useTasks = () => {
                 ownerId: user.uid,
                 assigneeEmail: "",
                 completed: false,
-                createdAt: serverTimestamp()
+                createdAt: serverTimestamp(),
+                ...(dueDate && { dueDate })
             });
             toast.success("Task created!");
         } catch (e) {

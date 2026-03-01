@@ -53,8 +53,8 @@ export default function Dashboard() {
     );
   }
 
-  const handleCreateTask = async (title: string, description: string) => {
-    await addTask(title, description);
+  const handleCreateTask = async (title: string, description: string, dueDate?: string) => {
+    await addTask(title, description, dueDate);
   };
 
   const filteredTasks = tasks.filter((task) => {

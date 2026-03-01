@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Task } from '@/hooks/useTasks';
 import { useAuth } from '@/context/AuthContext';
-import { Clock, User, CheckCircle2, Circle, MoreVertical, Trash2, Send } from 'lucide-react';
+import { Clock, User, CheckCircle2, Circle, MoreVertical, Trash2, Send, Calendar } from 'lucide-react';
 
 interface TaskCardProps {
     task: Task;
@@ -38,6 +38,33 @@ export function TaskCard({ task, onToggle, onDelete, onAssign }: TaskCardProps) 
             day: 'numeric',
         })
         : 'Just now';
+
+    let dueDateColor = 'text-zinc-500 dark:text-zinc-400';
+    let dueDateText = '';
+
+    if (task.dueDate && !task.completed) {
+        const dueDateObj = new Date(task.dueDate + 'T00:00:00'); // Force local midnight
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const daysUntilDue = Math.round((dueDateObj.getTime() - today.getTime()) / (1000 * 3600 * 24));
+
+        if (daysUntilDue < 0) {
+            dueDateColor = 'text-red-600 dark:text-red-400 font-semibold';
+            dueDateText = `Overdue (${Math.abs(daysUntilDue)}d)`;
+        } else if (daysUntilDue === 0) {
+            dueDateColor = 'text-orange-500 dark:text-orange-400 font-semibold';
+            dueDateText = 'Due Today';
+        } else if (daysUntilDue === 1) {
+            dueDateColor = 'text-emerald-600 dark:text-emerald-400';
+            dueDateText = 'Due Tomorrow';
+        } else {
+            dueDateText = `Due ${dueDateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+        }
+    } else if (task.dueDate && task.completed) {
+        dueDateText = `Was due ${new Date(task.dueDate + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+        dueDateColor = 'text-zinc-400 dark:text-zinc-500 line-through';
+    }
 
     return (
         <motion.div
@@ -134,6 +161,13 @@ export function TaskCard({ task, onToggle, onDelete, onAssign }: TaskCardProps) 
                         }`}>
                         <User className="h-3.5 w-3.5" />
                         {isAssignedToMe ? 'Assigned to you' : task.assigneeEmail}
+                    </div>
+                )}
+
+                {task.dueDate && (
+                    <div className={`flex items-center gap-1.5 text-xs font-medium ${dueDateColor}`}>
+                        <Calendar className="h-3.5 w-3.5" />
+                        {dueDateText}
                     </div>
                 )}
             </div>

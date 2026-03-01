@@ -5,12 +5,13 @@ import { X, Plus } from 'lucide-react';
 interface CreateTaskModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (title: string, description: string) => Promise<void>;
+    onSubmit: (title: string, description: string, dueDate?: string) => Promise<void>;
 }
 
 export function CreateTaskModal({ isOpen, onClose, onSubmit }: CreateTaskModalProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [dueDate, setDueDate] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -18,11 +19,12 @@ export function CreateTaskModal({ isOpen, onClose, onSubmit }: CreateTaskModalPr
         if (!title.trim()) return;
 
         setIsSubmitting(true);
-        await onSubmit(title.trim(), description.trim());
+        await onSubmit(title.trim(), description.trim(), dueDate);
         setIsSubmitting(false);
 
         setTitle('');
         setDescription('');
+        setDueDate('');
         onClose();
     };
 
@@ -83,6 +85,19 @@ export function CreateTaskModal({ isOpen, onClose, onSubmit }: CreateTaskModalPr
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
                                             className="w-full resize-none rounded-xl border border-zinc-200 bg-transparent px-4 py-2.5 text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900 dark:border-zinc-700 dark:text-zinc-50 dark:focus:border-zinc-50 dark:focus:ring-zinc-50"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="dueDate" className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                                            Due Date <span className="text-zinc-400 font-normal">(Optional)</span>
+                                        </label>
+                                        <input
+                                            id="dueDate"
+                                            type="date"
+                                            value={dueDate}
+                                            onChange={(e) => setDueDate(e.target.value)}
+                                            className="w-full rounded-xl border border-zinc-200 bg-transparent px-4 py-2.5 text-zinc-900 focus:border-zinc-900 focus:outline-none focus:ring-1 focus:ring-zinc-900 dark:border-zinc-700 dark:text-zinc-50 dark:focus:border-zinc-50 dark:focus:ring-zinc-50 dark:[color-scheme:dark]"
                                         />
                                     </div>
                                 </div>
